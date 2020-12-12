@@ -1,12 +1,15 @@
 package com.qzh.jmm;
 
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
+
 /**
  * @version 1.0
  * @Auther: qzh
  * @Date: 2020/12/12 - 16:11
  * @Description: com.qzh.jmm
  */
-class Phone{
+class Phone implements Runnable{
     public synchronized void sendSMS() throws Exception{
         System.out.println(Thread.currentThread().getName()+"\t"+"invoked sendSMS");
         sendEmail();
@@ -14,6 +17,33 @@ class Phone{
 
     public synchronized void sendEmail() throws Exception{
         System.out.println(Thread.currentThread().getName()+"\t"+"==========sendEmail sendSMS");
+    }
+
+    ReentrantLock lock = new ReentrantLock();
+    @Override
+    public void run() {
+        get();
+    }
+
+    public void get(){
+        lock.lock();
+
+        try {
+            System.out.println(Thread.currentThread().getName()+"\t"+"invoked sendSMS");
+            set();
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public void set(){
+        lock.lock();
+
+        try {
+            System.out.println(Thread.currentThread().getName()+"\t"+"==========sendEmail sendSMS");
+        } finally {
+            lock.unlock();
+        }
     }
 }
 
@@ -44,5 +74,20 @@ public class ReenterLockDemo {
                 e.printStackTrace();
             }
         },"t2").start();
+
+
+        try {
+            TimeUnit.SECONDS.sleep(1);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println("------------------------");
+
+        Thread t3 = new Thread(phone);
+        Thread t4 = new Thread(phone);
+
+        t3.start();
+        t4.start();
     }
 }
