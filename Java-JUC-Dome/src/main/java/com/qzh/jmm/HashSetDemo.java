@@ -12,6 +12,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
  * @Description: com.qzh.jmm
  */
 public class HashSetDemo{
+
     public static void main(String[] args) {
         Set set = new HashSet();
 //        Set set = new CopyOnWriteArraySet<>();
